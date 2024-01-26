@@ -183,6 +183,15 @@ house_dist = GeneralizedExtremeValue(gauge_dist.μ - offset, gauge_dist.σ, gaug
 plot!(p1, house_dist; label="House Distribution", linewidth=2)
 ```
 
+```{julia}
+using Random
+```
 
+```{julia}
+N=1000000
+sample = Array{Int64}(undef, house_dist, N)
+# sample = rand(house_dist, N)
+result = damage_fn.(sample)
+```
 
 # Discussion
