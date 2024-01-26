@@ -1,7 +1,7 @@
 ---
 title: "Lab 3: Depth-Damage Models"
 subtitle: "DataFrames and Distributions"
-author: "Your Name"
+author: "Lucia Romero-Alston (lmr12)"
 date: 2024-01-26
 week: 3
 categories: [Lab]
@@ -58,7 +58,37 @@ Plots.default(; margin=6Plots.mm)
 
 # Site information
 
+```{julia}
+haz_fl_dept = CSV.read("data/haz_fl_dept.csv", DataFrame)
+include("depthdamage.jl")
+```
+
 # Depth-Damage
+
+```{julia}
+row = @rsubset(
+    haz_fl_dept, :Description == "one story, Contents, fresh water, short duration"
+)[
+    1,:,
+]
+dd = DepthDamageData(row)
+```
+
+```{julia}
+fieldnames(typeof(dd))
+```
+
+```{julia}
+scatter(
+    dd.depths,
+    dd.damages;
+    xlabel="Flood Depth at House",
+    ylabel="Damage (%)",
+    label="$(dd.description) ($(dd.source))",
+    legend=:bottomright,
+    size=(700, 500),
+)
+```
 
 # Expected annual damages
 
