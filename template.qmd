@@ -157,4 +157,28 @@ p
 
 # Expected annual damages
 
+```{julia}
+gauge_dist = GeneralizedExtremeValue(5, 1.5, 0.1)
+```
+
+```{julia}
+p1 = plot(
+    gauge_dist;
+    label="Gauge Distribution",
+    xlabel="Water Level (ft)",
+    ylabel="Probability Density",
+    legend=:topright,
+    linewidth=2,
+)
+```
+
+```{julia}
+offset = 3.74 # building is 3.74 feet above gauge
+house_dist = GeneralizedExtremeValue(gauge_dist.μ - offset, gauge_dist.σ, gauge_dist.ξ)
+```
+
+```{julia}
+plot!(p1, house_dist; label="House Distribution", linewidth=2)
+```
+
 # Discussion
