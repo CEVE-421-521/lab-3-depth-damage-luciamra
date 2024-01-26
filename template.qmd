@@ -58,6 +58,9 @@ Plots.default(; margin=6Plots.mm)
 
 # Site information
 
+This is an analysis of The Harbor House Hotel & Marina at Pier 21 at 28 Pier 21, Galveston using data from the 8771450 Galveston Pier 21, TX guage. This building is "near" the water guage as it is located on the same pier as it.
+Building Elevation: 10.33 ft
+
 ```{julia}
 haz_fl_dept = CSV.read("data/haz_fl_dept.csv", DataFrame)
 include("depthdamage.jl")
@@ -91,5 +94,24 @@ scatter(
 ```
 
 # Expected annual damages
+
+```{julia}
+itp = let
+    depth_ft = ustrip.(u"ft", dd.depths)
+    damage_frac = dd.damages
+    Interpolations.LinearInterpolation(
+        depth_ft,
+        damage_frac;
+        extrapolation_bc=Interpolations.Flat(),
+    )
+end
+```
+
+```{julia}
+let
+    dmg_fn(x) = itp(ustrip.(u"ft", x))
+    dmg_fn.([3.1u"ft", 2.2u"m", 91.4u"inch"])
+end
+```
 
 # Discussion
