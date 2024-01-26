@@ -58,8 +58,9 @@ Plots.default(; margin=6Plots.mm)
 
 # Site information
 
-This is an analysis of The Harbor House Hotel & Marina at Pier 21 at 28 Pier 21, Galveston using data from the 8771450 Galveston Pier 21, TX guage. This building is "near" the water guage as it is located on the same pier as it.
-Building Elevation: 10.33 ft
+This is an analysis of the Fisherman's Wharf at 2200 Harborside Dr, Galveston using data from the 8771450 Galveston Pier 21, TX guage. This building is "near" the water guage as it is located right off of the pier where the guage is placed.
+Building Elevation: 3.74 ft
+Depth-Damage Function: USACE-Galveston Cafeteria Restaurant, Structure
 
 ```{julia}
 haz_fl_dept = CSV.read("data/haz_fl_dept.csv", DataFrame)
@@ -70,7 +71,7 @@ include("depthdamage.jl")
 
 ```{julia}
 row = @rsubset(
-    haz_fl_dept, :Description == "one story, Contents, fresh water, short duration"
+    haz_fl_dept, :Description == "Cafeteria Restaurant, structure"
 )[
     1,:,
 ]
@@ -85,7 +86,7 @@ fieldnames(typeof(dd))
 scatter(
     dd.depths,
     dd.damages;
-    xlabel="Flood Depth at House",
+    xlabel="Flood Depth at Building",
     ylabel="Damage (%)",
     label="$(dd.description) ($(dd.source))",
     legend=:bottomright,
