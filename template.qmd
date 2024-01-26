@@ -155,6 +155,8 @@ end
 p
 ```
 
+This curve is plotted in 1 inch increments from -10 to 30 feet. This graph represents an estimation of the amount of damage that a building will experience given a certain flood depth. Plotting this at 1 inch increments provides a detailed graph with the estimated damage for eveyr inch of water rise that can be more generally used for depths that are in between foot measurments.
+
 # Expected annual damages
 
 ```{julia}
@@ -180,5 +182,7 @@ house_dist = GeneralizedExtremeValue(gauge_dist.μ - offset, gauge_dist.σ, gaug
 ```{julia}
 plot!(p1, house_dist; label="House Distribution", linewidth=2)
 ```
+
+
 
 # Discussion
