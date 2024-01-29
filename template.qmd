@@ -189,8 +189,10 @@ using Random
 
 ```{julia}
 N=1000000
-sample = Array{Int64}(undef, house_dist, N)
-# sample = rand(house_dist, N)
+sample = Array{Int64}(undef, N)
+for j in range(0,N,N)
+    sample[j] = rand(house_dist, N)
+end
 result = damage_fn.(sample)
 ```
 
