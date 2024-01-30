@@ -60,7 +60,6 @@ Plots.default(; margin=6Plots.mm)
 
 This is an analysis of the Fisherman's Wharf at 2200 Harborside Dr, Galveston using data from the 8771450 Galveston Pier 21, TX guage. This building is "near" the water guage as it is located right off of the pier where the guage is placed.
 Building Elevation: 3.74 ft
-Depth-Damage Function: USACE-Galveston Cafeteria Restaurant, Structure
 
 ```{julia}
 haz_fl_dept = CSV.read("data/haz_fl_dept.csv", DataFrame)
@@ -68,6 +67,9 @@ include("depthdamage.jl")
 ```
 
 # Depth-Damage
+
+Depth-Damage Function: USACE-Galveston Cafeteria Restaurant, Structure
+I am using this as the depth damage function because the building I am analyzing fits under the classification of a restaurant. More importantly, it is in Galveston, so in order to accurately represent water levels in the area, I have to use a function that is based off of this geographical location.
 
 ```{julia}
 row = @rsubset(
@@ -155,7 +157,7 @@ end
 p
 ```
 
-This curve is plotted in 1 inch increments from -10 to 30 feet. This graph represents an estimation of the amount of damage that a building will experience given a certain flood depth. Plotting this at 1 inch increments provides a detailed graph with the estimated damage for eveyr inch of water rise that can be more generally used for depths that are in between foot measurments.
+This curve is plotted in 1 inch increments from -10 to 30 feet. This graph represents an estimation of the amount of damage that a building will experience given a certain flood depth. Plotting this at 1 inch increments provides a detailed graph with the estimated damage for every inch of water rise that can be more generally used for depths that are in between foot measurments.
 
 # Expected annual damages
 
@@ -186,6 +188,8 @@ plot!(p1, house_dist; label="House Distribution", linewidth=2)
 ```{julia}
 using Random
 ```
+
+The following is known as a Monte Carlo Algorithm, which is estimating the expected annual damages based on 1,000,000 samples. This algorithm randomly takes samples of hazard from a distribution, the vale
 
 ```{julia}
 N=1000000
