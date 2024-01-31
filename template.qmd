@@ -189,7 +189,7 @@ plot!(p1, house_dist; label="House Distribution", linewidth=2)
 using Random
 ```
 
-The following is known as a Monte Carlo Algorithm, which is estimating the expected annual damages based on 1,000,000 samples. This algorithm randomly takes samples of hazard from a distribution, the vale
+The following is known as a Monte Carlo Algorithm, which is estimating the expected annual damages based on 1,000,000 samples. This algorithm randomly takes samples of hazard from a distribution, which are then inpuut into the damge function in order to get a distribution of damages from randomized hazards. The mean of these damage values gives the average value of damage that a home in this location might experience during an event.
 
 ```{julia}
 N=1000000
@@ -198,4 +198,102 @@ result = damage_fn.(sample)
 mean(result)
 ```
 
+The result of this algorithm is 16.08%.
+
 # Discussion
+
+Here I am perfomring another trial on the same location using a different Depth-Damage function. For this analysis I am using the USACE-Galveston "one story, no basement, Structure" function. This trial can demonstrate how changes in depth damage function can change results. 
+
+```{julia}
+row2 = @rsubset(
+    haz_fl_dept, :Description == "one story, no basement, Structure"
+)[
+    1,:,
+]
+dd2 = DepthDamageData(row2)
+fieldnames(typeof(dd2))
+```
+
+```{julia}
+scatter(
+    dd2.depths,
+    dd2.damages;
+    xlabel="Flood Depth at Building",
+    ylabel="Damage (%)",
+    label="$(dd2.description) ($(dd2.source))",
+    legend=:bottomright,
+    size=(700, 500),
+)
+```
+
+```{julia}
+itp = let
+    depth_ft2 = ustrip.(u"ft", dd2.depths)
+    damage_frac2 = dd2.damages
+    Interpolations.LinearInterpolation(
+        depth_ft2,
+        damage_frac2;
+        extrapolation_bc=Interpolations.Flat(),
+    )
+end
+```
+
+```{julia}
+let
+    dmg_fn2(x) = itp(ustrip.(u"ft", x))
+    dmg_fn2.([3.1u"ft", 2.2u"m", 91.4u"inch"])
+end
+```
+
+```{julia}
+function get_depth_damage_function(
+    depth_train2::Vector{<:T}, dmg_train2::Vector{<:AbstractFloat}
+) where {T<:Unitful.Length}
+
+    # interpolate
+    depth_ft2 = ustrip.(u"ft", depth_train2)
+    interp_fn2 = Interpolations.LinearInterpolation(
+        depth_ft2,
+        dmg_train2;
+        extrapolation_bc=Interpolations.Flat(),
+    )
+
+    damage_fn2 = function (depth::T2) where {T2<:Unitful.Length}
+        return interp_fn2(ustrip.(u"ft", depth))
+    end
+    return damage_fn2
+end
+```
+
+```{julia}
+damage_fn2 = get_depth_damage_function(dd2.depths, dd2.damages)
+```
+
+```{julia}
+p = let
+    depths2 = uconvert.(u"ft", (-7.0u"ft"):(1.0u"inch"):(30.0u"ft"))
+    damages2 = damage_fn2.(depths2)
+    scatter(
+        depths2,
+        damages2;
+        xlabel="Flood Depth",
+        ylabel="Damage (%)",
+        label="$(dd.description) ($(dd.source))",
+        legend=:bottomright,
+        size=(800, 400),
+        linewidth=2,
+    )
+end
+p
+```
+
+```{julia}
+N=1000000
+sample2 = rand(house_dist, N) .* 1.0u"ft"
+result2 = damage_fn2.(sample2)
+mean(result2)
+```
+
+The result of this algorithm is 32.14%
+
+This result is double that from the prefious depth-damage function. This extreme shift in results demonstrates high sensibiolity to the kind of depth-damage function used. This is important to take into consideration when choosing a function because the results can impact the way in which communities prepare for flood events, whether it is building codes or insurance.
